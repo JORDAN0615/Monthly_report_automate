@@ -1,7 +1,6 @@
 import oracledb
 import pandas as pd
 import os
-import re
 from datetime import datetime
 from calendar import monthrange
 from dotenv import load_dotenv
@@ -105,16 +104,12 @@ def generate_reports():
                     print(f"  Query {i} 跳過：無 SQL")
                     continue
                 try:
-                    # 動態替換 SQL 中的公司代號（支援不同空格格式）
-                    modified_sql = re.sub(
-                        r"c_comp_co\s*=\s*'101'",  # 匹配 c_comp_co='101' 或 c_comp_co = '101'
-                        f"c_comp_co='{company_code}'",
+                    # 使用參數化查詢執行 SQL（SQL 中使用 :company_code）
+                    df = pd.read_sql(
                         sql,
-                        flags=re.IGNORECASE
+                        connection,
+                        params={'company_code': company_code}
                     )
-
-                    # 執行 SQL 並讀取結果成 DataFrame
-                    df = pd.read_sql(modified_sql, connection)
 
                     # 寫入不同工作表（使用自訂名稱）
                     sheet_name = sheet_names[i-1]  # 因為 i 從 1 開始，所以要減 1

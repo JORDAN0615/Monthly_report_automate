@@ -4,4 +4,4 @@ SELECT  c.c_comp_co, c.c_y, s.C_SHD_ACTNO ,
 FROM shdexrissuancemaster s  , COMPANYISSUANCE c
 WHERE s.COMPANYISSUANCE_UUID =  c.UUID
 and to_char(s.C_WITSHA_DT,'yyyymmdd') between '20250301' and '20250331'
-AND c.c_comp_co='101'
+AND c.c_comp_co = :company_code
