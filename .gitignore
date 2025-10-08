@@ -1,0 +1,25 @@
+# 環境變數（包含敏感資訊）
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 虛擬環境
+.venv/
+venv/
+ENV/
+
+# 產生的 Excel 檔案
+*.xlsx
+
+# IDE
+.vscode/
+.idea/
+
+# 其他
+*.log
+*.txt
