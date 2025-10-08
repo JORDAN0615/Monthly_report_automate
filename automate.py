@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from calendar import monthrange
 from dotenv import load_dotenv
+import msoffcrypto
 
 def generate_reports():
     """產生稽核報表的主函數"""
@@ -94,10 +95,11 @@ def generate_reports():
     for company_code in company_codes:
         # 檔案名稱格式：公司代號103_稽核資料_1140901~1140930.xlsx
         output_file = f"公司代號{company_code}_稽核資料_{date_range}.xlsx"
+        temp_file = f"公司代號{company_code}_稽核資料_{date_range}_temp.xlsx"
         print(f"\n開始處理公司代號 {company_code}...")
 
-        # 開啟 Excel 寫入器
-        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+        # 先產生到暫存檔
+        with pd.ExcelWriter(temp_file, engine="openpyxl") as writer:
             for i, sql in enumerate(sql_queries, 1):
                 if not sql:  # 跳過空 SQL
                     print(f"  Query {i} 跳過：無 SQL")
@@ -127,7 +129,31 @@ def generate_reports():
                 except Exception as e:
                     print(f"  {sheet_name} 錯誤：{e}")
 
-        print(f"✓ {output_file} 已產生")
+        # 使用 msoffcrypto-tool 加密 Excel 檔案
+        password = "8502"
+        try:
+            # 如果目標檔案已存在，先刪除
+            if os.path.exists(output_file):
+                os.remove(output_file)
+
+            # 讀取未加密檔案並加密
+            with open(temp_file, 'rb') as input_file:
+                office_file = msoffcrypto.OfficeFile(input_file)
+
+                with open(output_file, 'wb') as output_encrypted:
+                    office_file.encrypt(password, output_encrypted)
+
+            # 刪除暫存檔
+            os.remove(temp_file)
+            print(f"✓ {output_file} 已產生並加密（密碼: {password}）")
+        except Exception as e:
+            print(f"✗ 加密失敗：{e}")
+            # 如果加密失敗，至少保留未加密的檔案
+            if os.path.exists(temp_file):
+                if os.path.exists(output_file):
+                    os.remove(output_file)
+                os.rename(temp_file, output_file)
+                print(f"⚠ 已產生未加密版本：{output_file}")
 
     # 關閉連接
     connection.close()
