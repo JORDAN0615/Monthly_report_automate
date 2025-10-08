@@ -13,27 +13,41 @@
 
 ## 系統需求
 
-- Python 3.8+
+- Python 3.13+
 - Windows 作業系統（使用 Outlook COM 介面）
 - Oracle Instant Client
 - Microsoft Outlook
+- uv（Python 套件管理工具）
 
 ## 安裝步驟
 
 ### 1. Clone 專案
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/JORDAN0615/Monthly_report_automate.git
 cd Monthly_report_automate
 ```
 
-### 2. 安裝套件
+### 2. 安裝 uv
+
+如果尚未安裝 uv，請先安裝：
 
 ```bash
-pip install -r requirements.txt
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### 3. 設定環境變數
+或參考 [uv 官方安裝指南](https://docs.astral.sh/uv/getting-started/installation/)
+
+### 3. 安裝套件
+
+使用 uv 安裝所有相依套件：
+
+```bash
+uv sync
+```
+
+### 4. 設定環境變數
 
 複製 `.env.example` 為 `.env` 並填入資料庫連線資訊：
 
@@ -47,15 +61,15 @@ cp .env.example .env
 # 資料庫連接設定
 DB_USER=your_username
 DB_PASSWORD=your_password
-DB_HOST=10.37.34.74
-DB_PORT=1523
-DB_SERVICE=SKMS01
+DB_HOST=your_DB_HOST
+DB_PORT=your_DB_PORT
+DB_SERVICE=your_DB_SERVICE
 
 # Oracle Client 路徑
 ORACLE_CLIENT_PATH=C:\instantclient_21_19
 ```
 
-### 4. 設定 SQL 查詢
+### 5. 設定 SQL 查詢
 
 將 SQL 查詢檔案放在 `sql/` 資料夾下：
 - `changeAddress.sql` - 地址變更查詢
@@ -64,9 +78,9 @@ ORACLE_CLIENT_PATH=C:\instantclient_21_19
 - `stockDividend.sql` - 股票股利查詢
 - `lost.sql` - 掛失查詢
 
-### 5. 設定郵件資訊
+### 6. 設定郵件資訊
 
-編輯 `send_email.py` 中的郵件設定（第 11-37 行）：
+編輯 [send_email.py](send_email.py) 中的郵件設定（第 11-37 行）：
 
 ```python
 recipient_email = "recipient@example.com"  # 收件者
@@ -80,22 +94,22 @@ send_mode = "display"  # 寄送模式
 
 ### 執行完整流程
 
-執行主程式，依序產生報表並寄送郵件：
+使用 uv 執行主程式，依序產生報表並寄送郵件：
 
 ```bash
-python main.py
+uv run main.py
 ```
 
 ### 單獨執行功能
 
 **只產生報表：**
 ```bash
-python automate.py
+uv run automate.py
 ```
 
 **只寄送郵件：**
 ```bash
-python send_email.py
+uv run send_email.py
 ```
 
 ## 檔案說明
@@ -109,7 +123,8 @@ Monthly_report_automate/
 ├── .env                     # 環境變數（不會被 git 追蹤）
 ├── .env.example             # 環境變數範例
 ├── .gitignore               # Git 忽略檔案
-├── requirements.txt         # Python 套件清單
+├── pyproject.toml           # uv 專案設定檔（套件依賴）
+├── uv.lock                  # uv 套件鎖定檔
 ├── README.md                # 說明文件
 └── sql/                     # SQL 查詢檔案資料夾
     ├── changeAddress.sql
@@ -126,7 +141,6 @@ Monthly_report_automate/
 - `公司代號101_稽核資料_1140901~1140930.xlsx`
 - `公司代號103_稽核資料_1140901~1140930.xlsx`
 
-**開啟密碼**: `8502`
 
 ## 郵件寄送模式
 
@@ -204,6 +218,4 @@ A: 檢查 `.env` 檔案中的資料庫設定是否正確，並確認 Oracle Clie
 
 MIT
 
-## 作者
 
-Generated with Claude Code
