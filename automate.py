@@ -4,17 +4,30 @@ import os
 import re
 from datetime import datetime
 from calendar import monthrange
+from dotenv import load_dotenv
 
 def generate_reports():
     """產生稽核報表的主函數"""
 
-    oracledb.init_oracle_client(lib_dir=r"C:\instantclient_21_19")
+    # 載入 .env 檔案
+    load_dotenv()
 
-    # 資料庫連接資訊（用 SQL Developer 的細節替換）
+    # 從環境變數讀取資料庫連接資訊
+    oracle_client_path = os.getenv('ORACLE_CLIENT_PATH')
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_host = os.getenv('DB_HOST')
+    db_port = os.getenv('DB_PORT')
+    db_service = os.getenv('DB_SERVICE')
+
+    oracledb.init_oracle_client(lib_dir=oracle_client_path)
+
+    # 資料庫連接
+    dsn = f"{db_host}:{db_port}/{db_service}"
     connection = oracledb.connect(
-        user="SKMGR",      # 你的 DB 使用者名
-        password="SKMGR",  # 你的密碼
-        dsn="10.37.34.74:1523/SKMS01"  # e.g., "localhost:1521/XE"
+        user=db_user,
+        password=db_password,
+        dsn=dsn
     )
 
     # 公司代號列表
