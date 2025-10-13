@@ -33,7 +33,7 @@ def generate_reports():
     # 公司代號列表
     company_codes = ['101', '103']
 
-    # 計算上個月的起訖日期（民國年格式）
+    # 計算上個月的起訖日期
     now = datetime.now()
     # 計算上個月
     if now.month == 1:
@@ -43,14 +43,18 @@ def generate_reports():
         last_month = now.month - 1
         last_year = now.year
 
-    # 轉換成民國年
-    roc_year = last_year - 1911
-
     # 上個月的最後一天
     last_day = monthrange(last_year, last_month)[1]
 
-    # 格式化日期範圍：1140901~1140930
+    # 格式化日期範圍用於檔案名稱（民國年格式）：1140901~1140930
+    roc_year = last_year - 1911
     date_range = f"{roc_year}{last_month:02d}01~{roc_year}{last_month:02d}{last_day:02d}"
+
+    # 格式化日期範圍用於 SQL 查詢（西元年格式）：20250901, 20250930
+    start_date = f"{last_year}{last_month:02d}01"
+    end_date = f"{last_year}{last_month:02d}{last_day:02d}"
+
+    print(f"查詢日期範圍：{start_date} ~ {end_date}")
 
     # 為每個工作表定義不同的欄位名稱
     column_mappings = {
@@ -104,11 +108,15 @@ def generate_reports():
                     print(f"  Query {i} 跳過：無 SQL")
                     continue
                 try:
-                    # 使用參數化查詢執行 SQL（SQL 中使用 :company_code）
+                    # 使用參數化查詢執行 SQL
                     df = pd.read_sql(
                         sql,
                         connection,
-                        params={'company_code': company_code}
+                        params={
+                            'company_code': company_code,
+                            'start_date': start_date,
+                            'end_date': end_date
+                        }
                     )
 
                     # 寫入不同工作表（使用自訂名稱）

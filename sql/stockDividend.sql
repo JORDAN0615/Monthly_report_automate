@@ -3,5 +3,5 @@ SELECT  c.c_comp_co, c.c_y, s.C_SHD_ACTNO ,
 ,to_char(s.C_WITSHA_DT,'yyyymmdd'), s.C_RECPT_SN
 FROM shdexrissuancemaster s  , COMPANYISSUANCE c
 WHERE s.COMPANYISSUANCE_UUID =  c.UUID
-and to_char(s.C_WITSHA_DT,'yyyymmdd') between '20250301' and '20250331'
+and to_char(s.C_WITSHA_DT,'yyyymmdd') between :start_date and :end_date
 AND c.c_comp_co = :company_code
