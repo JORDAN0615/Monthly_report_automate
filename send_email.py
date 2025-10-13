@@ -8,7 +8,7 @@ def send_email():
 
     # ========== 設定區 ==========
     # 收件者 Email（多個收件者用分號分隔，例如："email1@example.com; email2@example.com"）
-    recipient_email = "jordan00661155@gmail.com"
+    recipient_email = "Nina_Kuo@wistron.com"
 
     # 副本（選填）
     cc_email = ""
