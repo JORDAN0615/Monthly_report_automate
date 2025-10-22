@@ -21,7 +21,7 @@ def send_email():
     subject_template = "RE: 股務系統每月月報"
 
     # 郵件內容
-    email_body = """Hi Nina,
+    email_body = """Hi Nina:
 
         附件為股務系統月報，請查收。
 
